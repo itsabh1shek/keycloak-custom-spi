@@ -105,3 +105,5 @@ target
 # Quarkus ephemeral data #
 ##########################
 quarkus/data/*.db
+
+**/*.iml
