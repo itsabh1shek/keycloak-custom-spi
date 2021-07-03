@@ -8,13 +8,21 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
 
+import java.util.Arrays;
 import java.util.List;
+
+import static com.itsabhishek.keycloak.Constants.*;
 
 public class SessionLimitAuthenticatorFactory implements AuthenticatorFactory {
 
+    private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
+            AuthenticationExecutionModel.Requirement.REQUIRED,
+            AuthenticationExecutionModel.Requirement.DISABLED
+    };
+
     @Override
     public String getDisplayType() {
-        return null;
+        return DISPLAY_TYPE;
     }
 
     @Override
@@ -24,12 +32,12 @@ public class SessionLimitAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public boolean isConfigurable() {
-        return false;
+        return true;
     }
 
     @Override
     public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
-        return new AuthenticationExecutionModel.Requirement[0];
+        return REQUIREMENT_CHOICES;
     }
 
     @Override
@@ -44,12 +52,22 @@ public class SessionLimitAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
-        return null;
+        ProviderConfigProperty realmCountLimit = new ProviderConfigProperty();
+        realmCountLimit.setName(USER_REALM_LIMIT);
+        realmCountLimit.setLabel("Maximum concurrent sessions for a user in a realm");
+        realmCountLimit.setType(ProviderConfigProperty.STRING_TYPE);
+        ProviderConfigProperty actionProperty = new ProviderConfigProperty();
+        actionProperty.setName(ACTION);
+        actionProperty.setLabel("Action when user session limit is exceeded");
+        actionProperty.setType(ProviderConfigProperty.LIST_TYPE);
+        actionProperty.setDefaultValue(DENY_NEW_SESSION);
+        actionProperty.setOptions(Arrays.asList(DENY_NEW_SESSION, TERMINATE_OLDEST_SESSION));
+        return Arrays.asList(realmCountLimit, actionProperty);
     }
 
     @Override
     public Authenticator create(KeycloakSession keycloakSession) {
-        return null;
+        return new SessionLimitAuthenticator(keycloakSession);
     }
 
     @Override
@@ -69,6 +87,6 @@ public class SessionLimitAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public String getId() {
-        return null;
+        return LIMIT_USER_SESSION;
     }
 }
