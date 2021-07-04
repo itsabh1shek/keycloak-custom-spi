@@ -38,7 +38,7 @@ public class SessionLimitAuthenticator implements Authenticator {
     private void handleExceededLimit(AuthenticationFlowContext authenticationFlowContext) {
         switch (action){
             case Constants.DENY_NEW_SESSION:
-                Response challengeResponse = authenticationFlowContext.form().setError("User already logged-in. Logout first and try again.").createErrorPage(Response.Status.FORBIDDEN);
+                Response challengeResponse = authenticationFlowContext.form().setError(Constants.DENY_NEW_SESSION_ERROR_MESSAGE).createErrorPage(Response.Status.FORBIDDEN);
                 authenticationFlowContext.failure(AuthenticationFlowError.INVALID_CLIENT_SESSION, challengeResponse);
                 break;
             case Constants.TERMINATE_OLDEST_SESSION:

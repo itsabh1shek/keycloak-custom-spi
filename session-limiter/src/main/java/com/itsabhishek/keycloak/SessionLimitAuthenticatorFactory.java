@@ -54,11 +54,11 @@ public class SessionLimitAuthenticatorFactory implements AuthenticatorFactory {
     public List<ProviderConfigProperty> getConfigProperties() {
         ProviderConfigProperty realmCountLimit = new ProviderConfigProperty();
         realmCountLimit.setName(USER_REALM_LIMIT);
-        realmCountLimit.setLabel("Maximum concurrent sessions for a user in a realm");
+        realmCountLimit.setLabel(USER_REALM_LIMIT_LABEL);
         realmCountLimit.setType(ProviderConfigProperty.STRING_TYPE);
         ProviderConfigProperty actionProperty = new ProviderConfigProperty();
         actionProperty.setName(ACTION);
-        actionProperty.setLabel("Action when user session limit is exceeded");
+        actionProperty.setLabel(ACTION_LABEL);
         actionProperty.setType(ProviderConfigProperty.LIST_TYPE);
         actionProperty.setDefaultValue(DENY_NEW_SESSION);
         actionProperty.setOptions(Arrays.asList(DENY_NEW_SESSION, TERMINATE_OLDEST_SESSION));
