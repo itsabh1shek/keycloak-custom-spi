@@ -56,11 +56,13 @@ public class SessionLimitAuthenticatorFactory implements AuthenticatorFactory {
         realmCountLimit.setName(USER_REALM_LIMIT);
         realmCountLimit.setLabel(USER_REALM_LIMIT_LABEL);
         realmCountLimit.setType(ProviderConfigProperty.STRING_TYPE);
+        realmCountLimit.setHelpText(USER_REALM_LIMIT_HELP_TEXT);
         ProviderConfigProperty actionProperty = new ProviderConfigProperty();
         actionProperty.setName(ACTION);
         actionProperty.setLabel(ACTION_LABEL);
         actionProperty.setType(ProviderConfigProperty.LIST_TYPE);
         actionProperty.setDefaultValue(DENY_NEW_SESSION);
+        actionProperty.setHelpText(ACTION_LABEL_HELP_TEXT);
         actionProperty.setOptions(Arrays.asList(DENY_NEW_SESSION, TERMINATE_OLDEST_SESSION));
         return Arrays.asList(realmCountLimit, actionProperty);
     }

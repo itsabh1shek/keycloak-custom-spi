@@ -1,6 +1,7 @@
 package com.itsabhishek.keycloak;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -27,24 +28,37 @@ public class SessionLimitAuthenticator implements Authenticator {
     public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
         AuthenticatorConfigModel configModel = authenticationFlowContext.getAuthenticatorConfig();
         action = configModel.getConfig().get(Constants.ACTION);
+        logger.info("action : "+action);
         UserModel userModel = authenticationFlowContext.getUser();
-        long limit = Long.parseLong(configModel.getConfig().get(Constants.USER_REALM_LIMIT));
-        long existingSessionCount = keycloakSession.sessions().getUserSessionsStream(authenticationFlowContext.getRealm(), userModel).count();
-        if(limitExceeds(limit, existingSessionCount)){
-            handleExceededLimit(authenticationFlowContext);
+        if(userModel != null && action != null) {
+            logger.info("current user: " + userModel.getUsername());
+            long limit = Long.parseLong(configModel.getConfig().get(Constants.USER_REALM_LIMIT));
+            logger.info("limit: " + limit);
+            long existingSessionCount = keycloakSession.sessions().getUserSessionsStream(authenticationFlowContext.getRealm(), userModel).count();
+            logger.info("existing session count: " + existingSessionCount);
+            if (limitExceeds(limit, existingSessionCount)) {
+                logger.info("exceeded session limit");
+                handleExceededLimit(authenticationFlowContext);
+            } else {
+                authenticationFlowContext.success();
+            }
+        } else {
+            authenticationFlowContext.success();
         }
     }
 
     private void handleExceededLimit(AuthenticationFlowContext authenticationFlowContext) {
         switch (action){
             case Constants.DENY_NEW_SESSION:
+                logger.info("denying new session");
                 Response challengeResponse = authenticationFlowContext.form().setError(Constants.DENY_NEW_SESSION_ERROR_MESSAGE).createErrorPage(Response.Status.FORBIDDEN);
                 authenticationFlowContext.failure(AuthenticationFlowError.INVALID_CLIENT_SESSION, challengeResponse);
                 break;
             case Constants.TERMINATE_OLDEST_SESSION:
+                logger.info("terminating oldest session");
                 logoutOldestSession(authenticationFlowContext);
+                authenticationFlowContext.success();
                 break;
-
         }
     }
 
@@ -65,7 +79,7 @@ public class SessionLimitAuthenticator implements Authenticator {
 
     @Override
     public boolean requiresUser() {
-        return true;
+        return false;
     }
 
     @Override
